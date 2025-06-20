@@ -1,0 +1,6 @@
+streamlit
+spotipy
+requests
+geopy
+timezonefinder
+pytz
