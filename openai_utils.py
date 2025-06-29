@@ -7,9 +7,9 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def generate_mood(feeling, weather, temp, time_of_day):
     prompt = (
-        f"Generate a concise 3-5 word English mood phrase for a music playlist "
-        f"based on the user's feeling '{feeling}', current weather '{weather}', temperature '{temp}°C', and time of day '{time_of_day}'. "
-        "Reply with ONLY the phrase without any explanation, punctuation, or hashtags."
+        f"User feeling: '{feeling}', weather: '{weather}', temperature: '{temp}°C', time: '{time_of_day}'. "
+        "Generate a 3-5 word English mood phrase for a music playlist. "
+        "Example: 'chill sunset vibes'. Only reply with the phrase. No explanations."
     )
     try:
         response = client.chat.completions.create(
