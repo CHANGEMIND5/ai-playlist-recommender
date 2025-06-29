@@ -5,10 +5,11 @@ from dotenv import load_dotenv
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def generate_mood(feeling, weather, temp):
+def generate_mood(feeling, weather, temp, time_of_day):
     prompt = (
-        f"You are an AI that creates music moods. The user feels '{feeling}' while the weather is '{weather}' and the temperature is '{temp}°C'. "
-        "Reply ONLY with a 3-5 word English mood phrase suitable for a music playlist. No explanations. No punctuation. No hashtags."
+        f"Generate a concise 3-5 word English mood phrase for a music playlist "
+        f"based on the user's feeling '{feeling}', current weather '{weather}', temperature '{temp}°C', and time of day '{time_of_day}'. "
+        "Reply with ONLY the phrase without any explanation, punctuation, or hashtags."
     )
     try:
         response = client.chat.completions.create(

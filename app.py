@@ -55,7 +55,7 @@ if city and feeling:
         mood_time = get_time_based_mood(local_time)
 
         with st.spinner("🔮 Generating mood with OpenAI..."):
-            combined_mood = generate_mood(feeling, weather, temp)
+            combined_mood = generate_mood(feeling, weather, temp, mood_time)
 
         if combined_mood.lower() == "calm reflective mood":
             st.warning("⚠️ OpenAI did not return a mood. Using weather-based mood instead.")
