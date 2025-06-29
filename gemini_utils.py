@@ -1,14 +1,13 @@
-# gemini_utils.py
-
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
 
-# .env에서 GEMINI_API_KEY 불러오기
+# 환경 변수 로드
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-model = genai.GenerativeModel("gemini-1.5-pro-latest")
+# 무료 계정용 모델로 변경
+model = genai.GenerativeModel("gemini-pro")
 
 def generate_mood(feeling, city):
     prompt = (
