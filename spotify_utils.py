@@ -7,7 +7,7 @@ import streamlit as st
 # Load local .env if present
 load_dotenv()
 
-# First try environment variables, then fall back to Streamlit secrets
+# Read credentials from env or Streamlit secrets
 client_id = os.getenv("SPOTIPY_CLIENT_ID") or st.secrets.get("SPOTIPY_CLIENT_ID")
 client_secret = os.getenv("SPOTIPY_CLIENT_SECRET") or st.secrets.get("SPOTIPY_CLIENT_SECRET")
 
@@ -15,8 +15,7 @@ client_secret = os.getenv("SPOTIPY_CLIENT_SECRET") or st.secrets.get("SPOTIPY_CL
 if not client_id or not client_secret:
     raise ValueError(
         "Spotify client credentials not found. "
-        "Please set SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET "
-        "in your .env or in Streamlit Cloud secrets."
+        "Please set SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET in your .env or in Streamlit Cloud secrets."
     )
 
 # Initialize Spotipy client
@@ -34,7 +33,9 @@ def search_playlist_by_mood(mood_keyword):
     print(f"🔍 Searching Spotify for keyword: {mood_keyword}")
     try:
         results = sp.search(q=mood_keyword, type="playlist", limit=5)
-        items = results.get("playlists", {}).get("items", [])
+        items_raw = results.get("playlists", {}).get("items", [])
+        # Filter out any None entries
+        items = [item for item in items_raw if item]
         playlists = []
 
         for item in items:
@@ -51,6 +52,14 @@ def search_playlist_by_mood(mood_keyword):
 
         print(f"✅ Found {len(playlists)} playlists for: {mood_keyword}")
         return playlists
+
+    except SpotifyOauthError as e:
+        print(f"❌ Spotify OAuth error: {e}")
+        return []
+    except Exception as e:
+        print(f"❌ Spotify search error: {e}")
+        return []
+
 
     except SpotifyOauthError as e:
         print(f"❌ Spotify OAuth error: {e}")
