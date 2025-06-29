@@ -2,15 +2,13 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def generate_mood(feeling, city):
     prompt = (
-        f"Given the user's current feeling '{feeling}' and the city '{city}', "
-        "generate a concise 3-5 word English mood phrase that captures the combined vibe, "
-        "suitable for music playlist recommendations."
+        f"You are an AI that creates music moods. The user is feeling '{feeling}' in '{city}'. "
+        "Respond ONLY with a concise 3-5 word English mood phrase suitable for a music playlist. Do not add any explanation."
     )
     try:
         response = client.chat.completions.create(
@@ -21,7 +19,8 @@ def generate_mood(feeling, city):
             ]
         )
         mood = response.choices[0].message.content.strip()
-        print(f"✅ OpenAI returned mood: {mood}")
+        print(f"✅ Raw OpenAI response object: {response}")
+        print(f"✅ Extracted mood before fallback check: '{mood}'")
         return mood
     except Exception as e:
         print(f"❌ Error generating mood: {e}")
