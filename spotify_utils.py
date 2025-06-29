@@ -1,36 +1,55 @@
 import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
+from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOauthError
 import os
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
 client_id = os.getenv("SPOTIPY_CLIENT_ID")
 client_secret = os.getenv("SPOTIPY_CLIENT_SECRET")
-client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
-sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+
+# Validate credentials
+if not client_id or not client_secret:
+    raise ValueError(
+        "Spotify client credentials not found. Please set SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET in your environment."
+    )
+
+# Initialize Spotipy client
+auth_manager = SpotifyClientCredentials(
+    client_id=client_id,
+    client_secret=client_secret
+)
+sp = spotipy.Spotify(client_credentials_manager=auth_manager)
 
 def search_playlist_by_mood(mood_keyword):
+    """
+    Search for playlists matching the mood keyword.
+    Returns a list of dicts with name, url, and image_url.
+    """
+    print(f"🔍 Searching Spotify for keyword: {mood_keyword}")
     try:
-        print(f"🔍 Searching Spotify for keyword: {mood_keyword}")
-        results = sp.search(q=mood_keyword, type='playlist', limit=5)
+        results = sp.search(q=mood_keyword, type="playlist", limit=5)
+        items = results.get("playlists", {}).get("items", [])
         playlists = []
 
-        for item in results['playlists']['items']:
-            playlist_name = item['name']
-            playlist_url = item['external_urls']['spotify']
-            image_url = item['images'][0]['url'] if item['images'] else "https://via.placeholder.com/80"
+        for item in items:
+            name = item.get("name")
+            url = item.get("external_urls", {}).get("spotify")
+            images = item.get("images") or []
+            image_url = images[0].get("url") if images else "https://via.placeholder.com/80"
 
             playlists.append({
-                "name": playlist_name,
-                "url": playlist_url,
+                "name": name,
+                "url": url,
                 "image_url": image_url
             })
 
         print(f"✅ Found {len(playlists)} playlists for: {mood_keyword}")
         return playlists
 
+    except SpotifyOauthError as e:
+        print(f"❌ Spotify OAuth error: {e}")
+        return []
     except Exception as e:
         print(f"❌ Spotify search error: {e}")
         return []
-
-        return [("Focus Flow", "https://open.spotify.com/playlist/37i9dQZF1DXc2aPBXGmXrt")]
