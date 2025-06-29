@@ -2,27 +2,27 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def generate_mood(feeling, city):
     prompt = (
-        f"You are an AI that creates music moods. The user is feeling '{feeling}' in '{city}'. "
-        "Respond ONLY with a concise 3-5 word English mood phrase suitable for a music playlist. Do not add any explanation."
+        f"You are an AI that creates music moods. The user feels '{feeling}' in '{city}'. "
+        "Reply ONLY with a 3-5 word English mood phrase suitable for a music playlist. No explanations. No punctuation. No hashtags."
     )
     try:
         response = client.chat.completions.create(
-            model="gpt-4o",   # ✅ 모델 버전을 gpt-4o로 변경
+            model="gpt-4o",   # ✅ 반드시 gpt-4o로
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt}
             ]
         )
         mood = response.choices[0].message.content.strip()
-        print(f"✅ Raw OpenAI response object: {response}")
-        print(f"✅ Extracted mood before fallback check: '{mood}'")
+        print(f"✅ Raw OpenAI response: {response}")
+        print(f"✅ Extracted mood before fallback: '{mood}'")
         return mood
     except Exception as e:
         print(f"❌ Error generating mood: {e}")
         return "Calm reflective mood"
+
