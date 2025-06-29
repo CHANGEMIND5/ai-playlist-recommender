@@ -2,6 +2,7 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
@@ -12,7 +13,7 @@ def generate_mood(feeling, city):
     )
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-preview",
+            model="gpt-4o",   # ✅ 모델 버전을 gpt-4o로 변경
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt}
