@@ -26,4 +26,3 @@ def generate_mood(feeling, city):
     except Exception as e:
         print(f"❌ Error generating mood: {e}")
         return "Calm reflective mood"
-```
