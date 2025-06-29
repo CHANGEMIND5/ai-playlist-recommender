@@ -7,7 +7,9 @@ from time_utils import get_local_time, get_time_based_mood, get_current_time_str
 from openai_utils import generate_mood
 
 # --- Theme Toggle ---
-theme = st.radio("Select Theme", ("Light", "Dark"), index=1)
+theme = st.radio("Select Theme", ("🌞 Light", "🌙 Dark"), index=1)
+# Normalize theme value without emoji
+theme_name = "Light" if "Light" in theme else "Dark"
 if theme == "Dark":
     bg_color = "#1e1e1e"
     text_color = "#ddd"
