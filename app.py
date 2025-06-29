@@ -3,7 +3,7 @@ import requests
 from weather_utils import map_weather_to_mood
 from spotify_utils import search_playlist_by_mood
 from time_utils import get_local_time, get_time_based_mood, get_current_time_string
-from gemini_utils import generate_mood
+from openai_utils import generate_mood  # OpenAI 기반으로 전환
 
 st.set_page_config(
     page_title="Skytonees",
@@ -57,11 +57,11 @@ if city and feeling:
             mood_weather = map_weather_to_mood(weather, temp)
             mood_time = get_time_based_mood(local_time)
 
-            with st.spinner("🔮 Generating mood with Gemini..."):
+            with st.spinner("🔮 Generating mood with OpenAI..."):
                 combined_mood = generate_mood(feeling, city)
 
             if combined_mood.lower() == "calm reflective mood":
-                st.warning("⚠️ Gemini did not return a mood. Using weather-based mood instead.")
+                st.warning("⚠️ OpenAI did not return a mood. Using weather-based mood instead.")
                 combined_mood = f"{mood_weather}, {mood_time}"
 
             info_html = f"""
@@ -69,7 +69,7 @@ if city and feeling:
             <b>🌤️ Weather:</b> {weather} &nbsp;&nbsp; <b>🌡️ Temp:</b> {temp}°C <br>
             <b>🕒 Local Time in {city}:</b> {current_time_str} <br>
             <b>🎯 Mood (Weather/Time):</b> {mood_weather}, {mood_time} <br>
-            <b>✨ Gemini Extracted Mood:</b> {combined_mood}
+            <b>✨ OpenAI Extracted Mood:</b> {combined_mood}
             </div>
             """
             st.markdown(info_html, unsafe_allow_html=True)
