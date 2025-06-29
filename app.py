@@ -3,34 +3,28 @@ import requests
 from weather_utils import map_weather_to_mood
 from spotify_utils import search_playlist_by_mood
 from time_utils import get_local_time, get_time_based_mood, get_current_time_string
-from gemini_utils import generate_mood  # 신규 기능 연동
+from gemini_utils import generate_mood
 
-# 페이지 설정
 st.set_page_config(
     page_title="Skytonees",
     page_icon="🎧",
     layout="centered"
 )
 
-# 타이틀 및 설명
 st.title("🎵 Skytonees: AI Music Playlist Recommender")
 st.markdown(
     "Let us find the perfect playlist for your **mood**, based on the weather, time, and your feeling 🎶"
 )
 
-# 사용자 입력
 city = st.text_input("🌍 Enter your city:", placeholder="e.g., Seoul").strip()
 feeling = st.text_input("😊 How do you feel now?", placeholder="e.g., Happy, Tired, Excited").strip()
 
-# 🔧 날씨 정보 가져오기
 def get_weather_description(city):
     api_key = st.secrets["WEATHERAPI_KEY"]
     url = f"http://api.weatherapi.com/v1/current.json?key={api_key}&q={city}&aqi=no"
-
     try:
         res = requests.get(url)
         data = res.json()
-
         weather = data["current"]["condition"]["text"]
         temp = data["current"]["temp_c"]
         return weather, temp
@@ -38,7 +32,6 @@ def get_weather_description(city):
         print(f"❌ Weather API error: {e}")
         return None, None
 
-# 🌤️ 메인 실행 로직
 if city and feeling:
     weather, temp = get_weather_description(city)
 
@@ -60,11 +53,8 @@ if city and feeling:
         current_time_str = get_current_time_string(local_time)
         mood_weather = map_weather_to_mood(weather, temp)
         mood_time = get_time_based_mood(local_time)
-
-        # ✅ Gemini로 사용자 feeling과 city 기반 종합 무드 추출
         combined_mood = generate_mood(feeling, city)
 
-        # 💡 정보 카드 표시
         info_html = f"""
         <div style="background-color:#f0f4f8; padding: 15px 20px; border-radius: 12px; margin-top: 20px; font-size:16px;">
         <b>🌤️ Weather:</b> {weather} &nbsp;&nbsp; <b>🌡️ Temp:</b> {temp}°C <br>
@@ -75,7 +65,6 @@ if city and feeling:
         """
         st.markdown(info_html, unsafe_allow_html=True)
 
-        # 🎧 플레이리스트 추천
         st.subheader("🎵 Recommended Playlists:")
         playlists = search_playlist_by_mood(combined_mood)
 
