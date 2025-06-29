@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import re
 from weather_utils import map_weather_to_mood
 from spotify_utils import search_playlist_by_mood
 from time_utils import get_local_time, get_time_based_mood, get_current_time_string
@@ -58,6 +59,13 @@ if city and feeling:
             st.warning("⚠️ OpenAI did not return a mood. Using weather-based mood instead.")
             combined_mood = f"{mood_weather}, {mood_time}"
 
+        # 키워드 정제: 특수문자 제거, 상위 3단어만 사용하여 검색
+        clean_mood = re.sub(r'[^A-Za-z0-9 ]', '', combined_mood)
+        tokens = clean_mood.split()
+        search_key = " ".join(tokens[:3]) if tokens else combined_mood
+        print(f"🔍 Refined search key: {search_key}")
+        playlists = search_playlist_by_mood(search_key)
+
         info_html = f"""
         <div style="background-color: rgba(30,30,30,0.6); padding: 15px 20px; border-radius: 12px; margin-top: 20px; font-size:16px; color:#ddd;">
         <b>🌤️ Weather:</b> {weather} &nbsp;&nbsp; <b>🌡️ Temp:</b> {temp}°C <br>
@@ -69,8 +77,6 @@ if city and feeling:
         st.markdown(info_html, unsafe_allow_html=True)
 
         st.subheader("🎵 Recommended Playlists:")
-        playlists = search_playlist_by_mood(combined_mood)
-
         if playlists:
             for playlist in playlists:
                 name = playlist.get("name")
@@ -92,4 +98,5 @@ elif city and not feeling:
     st.info("😊 Please enter your current feeling to get personalized mood recommendations.")
 else:
     st.info("🌍 Please enter a city and your feeling to get your mood-based playlist recommendations.")
+
 

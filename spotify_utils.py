@@ -2,16 +2,21 @@ import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials, SpotifyOauthError
 import os
 from dotenv import load_dotenv
+import streamlit as st
 
-# Load environment variables
+# Load local .env if present
 load_dotenv()
-client_id = os.getenv("SPOTIPY_CLIENT_ID")
-client_secret = os.getenv("SPOTIPY_CLIENT_SECRET")
+
+# First try environment variables, then fall back to Streamlit secrets
+client_id = os.getenv("SPOTIPY_CLIENT_ID") or st.secrets.get("SPOTIPY_CLIENT_ID")
+client_secret = os.getenv("SPOTIPY_CLIENT_SECRET") or st.secrets.get("SPOTIPY_CLIENT_SECRET")
 
 # Validate credentials
 if not client_id or not client_secret:
     raise ValueError(
-        "Spotify client credentials not found. Please set SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET in your environment."
+        "Spotify client credentials not found. "
+        "Please set SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET "
+        "in your .env or in Streamlit Cloud secrets."
     )
 
 # Initialize Spotipy client
@@ -24,7 +29,7 @@ sp = spotipy.Spotify(client_credentials_manager=auth_manager)
 def search_playlist_by_mood(mood_keyword):
     """
     Search for playlists matching the mood keyword.
-    Returns a list of dicts with name, url, and image_url.
+    Returns a list of dicts with keys: name, url, image_url.
     """
     print(f"🔍 Searching Spotify for keyword: {mood_keyword}")
     try:
