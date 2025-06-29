@@ -9,7 +9,6 @@ from openai_utils import generate_mood
 # --- Theme Toggle ---
 theme = st.radio("Select Theme", ("🌞 Light", "🌙 Dark"), index=1)
 theme_name = "Light" if "Light" in theme else "Dark"
-
 if theme_name == "Dark":
     bg_color = "#1e1e1e"
     text_color = "#ddd"
@@ -117,3 +116,11 @@ elif city and not feeling:
     st.info("😊 Please enter your current feeling.")
 else:
     st.info("🌍 Please enter a city and your feeling.")
+
+# Footer
+st.markdown(
+    "<div style='text-align:center; font-size:12px; color: #888; margin-top:40px;'>" +
+    "Built with ❤️ by TONY JUNG" +
+    "</div>",
+    unsafe_allow_html=True
+)
