@@ -51,7 +51,7 @@ if city and feeling:
         mood_weather = map_weather_to_mood(weather, temp)
         mood_time = get_time_based_mood(local_time)
 
-        with st.status("🔮 Generating mood with OpenAI..."):
+        with st.spinner("🔮 Generating mood with OpenAI..."):
             combined_mood = generate_mood(feeling, weather, temp, mood_time)
 
         if combined_mood.lower() == "calm reflective mood":
@@ -92,3 +92,4 @@ elif city and not feeling:
     st.info("😊 Please enter your current feeling to get personalized mood recommendations.")
 else:
     st.info("🌍 Please enter a city and your feeling to get your mood-based playlist recommendations.")
+
