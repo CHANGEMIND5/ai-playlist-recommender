@@ -1,46 +1,36 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
-import streamlit as st  # ✅ secrets 불러오기 위해 필요
+import os
+from dotenv import load_dotenv
 
-# Authenticate with Spotify API using secrets
-sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
-    client_id=st.secrets["SPOTIFY_CLIENT_ID"],
-    client_secret=st.secrets["SPOTIFY_CLIENT_SECRET"]
-))
+load_dotenv()
+client_id = os.getenv("SPOTIPY_CLIENT_ID")
+client_secret = os.getenv("SPOTIPY_CLIENT_SECRET")
+client_credentials_manager = SpotifyClientCredentials(client_id=client_id, client_secret=client_secret)
+sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
 
-def search_playlist_by_mood(mood_keywords):
+def search_playlist_by_mood(mood_keyword):
     try:
-        keywords = [kw.strip().lower() for kw in mood_keywords.split(",") if kw.strip()]
+        print(f"🔍 Searching Spotify for keyword: {mood_keyword}")
+        results = sp.search(q=mood_keyword, type='playlist', limit=5)
+        playlists = []
 
-        for keyword in keywords:
-            print(f"🔍 Searching Spotify for keyword: {keyword}")
-            results = sp.search(q=keyword, type='playlist', limit=5)
-            print("🔎 Raw Spotify result:", results)
+        for item in results['playlists']['items']:
+            playlist_name = item['name']
+            playlist_url = item['external_urls']['spotify']
+            image_url = item['images'][0]['url'] if item['images'] else "https://via.placeholder.com/80"
 
-            if not results or "playlists" not in results:
-                continue
+            playlists.append({
+                "name": playlist_name,
+                "url": playlist_url,
+                "image_url": image_url
+            })
 
-            playlists_data = results.get("playlists")
-            if not playlists_data or "items" not in playlists_data:
-                continue
-
-            items = playlists_data["items"]
-
-            # ✅ None이 아닌 아이템만 필터링
-            valid_items = [item for item in items if item is not None]
-
-            if valid_items:
-                playlists = [
-                    (item["name"], item["external_urls"]["spotify"])
-                    for item in valid_items
-                ]
-                if playlists:
-                    print(f"✅ Found playlists for: {keyword}")
-                    return playlists
-
-        print("⚠️ No playlists found. Using fallback.")
-        return [("Focus Flow", "https://open.spotify.com/playlist/37i9dQZF1DXc2aPBXGmXrt")]
+        print(f"✅ Found {len(playlists)} playlists for: {mood_keyword}")
+        return playlists
 
     except Exception as e:
-        print(f"❌ Spotify API error: {e}")
+        print(f"❌ Spotify search error: {e}")
+        return []
+
         return [("Focus Flow", "https://open.spotify.com/playlist/37i9dQZF1DXc2aPBXGmXrt")]

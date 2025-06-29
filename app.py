@@ -3,7 +3,7 @@ import requests
 from weather_utils import map_weather_to_mood
 from spotify_utils import search_playlist_by_mood
 from time_utils import get_local_time, get_time_based_mood, get_current_time_string
-from openai_utils import generate_mood  # OpenAI 기반으로 최신화
+from openai_utils import generate_mood
 
 st.set_page_config(
     page_title="Skytonees",
@@ -47,14 +47,11 @@ if city and feeling:
             local_time = get_local_time(city)
             st.session_state.city_cache[city] = local_time
 
-        if local_time is None:
-            st.warning("⚠️ Unable to retrieve local time. Displaying 'Unknown' and using default mood.")
-
         current_time_str = get_current_time_string(local_time)
         mood_weather = map_weather_to_mood(weather, temp)
         mood_time = get_time_based_mood(local_time)
 
-        with st.spinner("🔮 Generating mood with OpenAI..."):
+        with st.status("🔮 Generating mood with OpenAI..."):
             combined_mood = generate_mood(feeling, weather, temp, mood_time)
 
         if combined_mood.lower() == "calm reflective mood":
@@ -62,7 +59,7 @@ if city and feeling:
             combined_mood = f"{mood_weather}, {mood_time}"
 
         info_html = f"""
-        <div style="background-color:#f0f4f8; padding: 15px 20px; border-radius: 12px; margin-top: 20px; font-size:16px;">
+        <div style="background-color: rgba(30,30,30,0.6); padding: 15px 20px; border-radius: 12px; margin-top: 20px; font-size:16px; color:#ddd;">
         <b>🌤️ Weather:</b> {weather} &nbsp;&nbsp; <b>🌡️ Temp:</b> {temp}°C <br>
         <b>🕒 Local Time in {city}:</b> {current_time_str} <br>
         <b>🎯 Mood (Weather/Time):</b> {mood_weather}, {mood_time} <br>
@@ -75,11 +72,16 @@ if city and feeling:
         playlists = search_playlist_by_mood(combined_mood)
 
         if playlists:
-            for name, url in playlists:
+            for playlist in playlists:
+                name = playlist.get("name")
+                url = playlist.get("url")
+                image_url = playlist.get("image_url")
+
                 card_html = f"""
-                <div style="background-color:#ffffff; padding:15px 20px; margin:10px 0; border-radius:10px;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); font-size:16px;">
-                <a href="{url}" target="_blank" style="text-decoration: none; color: #000000;">🎧 {name}</a>
+                <div style="background-color: rgba(30,30,30,0.6); padding:15px 20px; margin:10px 0; border-radius:10px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4); font-size:16px; color: #dddddd; display: flex; align-items: center;">
+                    <img src="{image_url}" alt="playlist cover" style="width:80px; height:80px; border-radius:8px; margin-right:15px;">
+                    <a href="{url}" target="_blank" style="text-decoration: none; color: #ffffff; font-weight: bold;">🎧 {name}</a>
                 </div>
                 """
                 st.markdown(card_html, unsafe_allow_html=True)
