@@ -4,5 +4,5 @@ requests
 geopy
 timezonefinder
 pytz
-openai
+google-generativeai
 python-dotenv
