@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 load_dotenv()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-def generate_mood(feeling, city):
+def generate_mood(feeling, weather, temp):
     prompt = (
-        f"You are an AI that creates music moods. The user feels '{feeling}' in '{city}'. "
+        f"You are an AI that creates music moods. The user feels '{feeling}' while the weather is '{weather}' and the temperature is '{temp}°C'. "
         "Reply ONLY with a 3-5 word English mood phrase suitable for a music playlist. No explanations. No punctuation. No hashtags."
     )
     try:
@@ -25,4 +25,5 @@ def generate_mood(feeling, city):
     except Exception as e:
         print(f"❌ Error generating mood: {e}")
         return "Calm reflective mood"
+
 
