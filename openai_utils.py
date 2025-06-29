@@ -12,7 +12,7 @@ def generate_mood(feeling, city):
     )
     try:
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",   # ✅ 반드시 gpt-4o로
+            model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": prompt}
